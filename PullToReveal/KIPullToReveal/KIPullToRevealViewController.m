@@ -14,7 +14,6 @@
 @interface KIPullToRevealViewController () <UIScrollViewDelegate, UITextFieldDelegate, MKMapViewDelegate>
 {
     @private
-    UIToolbar *_toolbar;
     UITextField *_searchTextField;
     BOOL _scrollViewIsDraggedDownwards;
     double _lastDragOffset;
@@ -31,12 +30,14 @@
 @synthesize pullToRevealDelegate = _pullToRevealDelegate;
 @synthesize centerUserLocation = _centerUserLocation;
 @synthesize mapView = _mapView;
+@synthesize toolbar = _toolbar;
+@synthesize mode = _mode;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
     self = [super initWithStyle:style];
     if (self) {
-        // Custom initialization
+        
     }
     return self;
 }
@@ -44,6 +45,11 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+}
+
+- (void) viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
 
     [self initializeMapView];
     [self initalizeToolbar];
@@ -83,14 +89,18 @@
 {
     _toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, -50, self.tableView.bounds.size.width, 50)];
     [_toolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-    _searchTextField = [[UITextField alloc] initWithFrame:CGRectMake(10, 7, _toolbar.bounds.size.width-20, 30)];
-    [_searchTextField setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-    [_searchTextField setBorderStyle:UITextBorderStyleRoundedRect];
-    [_searchTextField setReturnKeyType:UIReturnKeySearch];
-    [_searchTextField setClearButtonMode:UITextFieldViewModeWhileEditing];
-    [_searchTextField addTarget:self action:@selector(searchTextFieldBecomeFirstResponder:) forControlEvents:UIControlEventEditingDidBegin];
-    [_searchTextField setDelegate:self];
-    [_toolbar addSubview:_searchTextField];
+    
+    if (self.mode == KIPullToRevealModeSearch) {
+        _searchTextField = [[UITextField alloc] initWithFrame:CGRectMake(10, 7, _toolbar.bounds.size.width-20, 30)];
+        [_searchTextField setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        [_searchTextField setBorderStyle:UITextBorderStyleRoundedRect];
+        [_searchTextField setReturnKeyType:UIReturnKeySearch];
+        [_searchTextField setClearButtonMode:UITextFieldViewModeWhileEditing];
+        [_searchTextField addTarget:self action:@selector(searchTextFieldBecomeFirstResponder:) forControlEvents:UIControlEventEditingDidBegin];
+        [_searchTextField setDelegate:self];
+        [_toolbar addSubview:_searchTextField];
+    }
+
     [self.tableView insertSubview:_toolbar aboveSubview:self.tableView];
 }
 
@@ -276,4 +286,5 @@
 {
     [self displayMapViewAnnotationsForTableViewCells];
 }
+
 @end

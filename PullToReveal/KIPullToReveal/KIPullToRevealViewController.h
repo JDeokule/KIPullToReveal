@@ -11,6 +11,13 @@
 
 #import "KIPullToRevealCell.h"
 
+typedef enum {
+	/** Middle bar is shown using a UITextField. This is the default. */
+	KIPullToRevealModeSearch,
+	KIPullToRevealModeNone
+} KIPullToRevealMode;
+
+
 @protocol KIPullToRevealDelegate <NSObject>
 
 @optional
@@ -20,9 +27,13 @@
 
 @interface KIPullToRevealViewController : UITableViewController
 
+@property (nonatomic) KIPullToRevealMode mode;
+
 @property (nonatomic, weak) id <KIPullToRevealDelegate> pullToRevealDelegate;
 @property (nonatomic, assign) BOOL centerUserLocation;
 @property (nonatomic, retain) MKMapView *mapView;
+
+@property (nonatomic, retain) UIToolbar *toolbar;
 
 @end
 
