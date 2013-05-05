@@ -87,7 +87,7 @@
 
 - (void) initalizeToolbar
 {
-    _toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, -50, self.tableView.bounds.size.width, 50)];
+    _toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, -44, self.tableView.bounds.size.width, 44)];
     [_toolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
     
     if (self.mode == KIPullToRevealModeSearch) {
@@ -184,16 +184,16 @@
         [self.tableView scrollsToTop];
     }
 
-    if(contentOffset >= -50)
+    if(contentOffset >= -44)
     {
         [_toolbar removeFromSuperview];
-        [_toolbar setFrame:CGRectMake(0, contentOffset, self.tableView.bounds.size.width, 50)];
+        [_toolbar setFrame:CGRectMake(0, contentOffset, self.tableView.bounds.size.width, 44)];
         [self.tableView addSubview:_toolbar];
     }
     else if(contentOffset < 0)
     {
         [_toolbar removeFromSuperview];
-        [_toolbar setFrame:CGRectMake(0, -50, self.tableView.bounds.size.width, 50)];
+        [_toolbar setFrame:CGRectMake(0, -44, self.tableView.bounds.size.width, 44)];
         [self.tableView insertSubview:_toolbar aboveSubview:self.tableView];
         
         // Resize map to viewable size
@@ -227,7 +227,7 @@
     [UIView animateWithDuration:kKIPTRAnimationDuration
                      animations:^()
      {
-         [self.tableView setContentInset:UIEdgeInsetsMake(kKIPTRTableViewContentInsetX+50,0,0,0)];
+         [self.tableView setContentInset:UIEdgeInsetsMake(kKIPTRTableViewContentInsetX+44,0,0,0)];
          [_mapView setFrame:
           CGRectMake(0, self.tableView.contentInset.top*-1, self.tableView.bounds.size.width, self.tableView.contentInset.top)
           ];
@@ -246,9 +246,8 @@
 #pragma mark - MapView
 - (void) displayMapViewAnnotationsForTableViewCells
 {
-    NSLog(@"displayMapViewAnnotationsForTableViewCells");
     // ATM this is only working for one section !!!
-    NSLog(@"self.tableView numberOfRowsInSection:0] = %d", [self.tableView numberOfRowsInSection:0]);
+
     [_mapView removeAnnotations:_mapView.annotations];
     for (int i = 0; i < [self.tableView numberOfRowsInSection:0]; i++)
     {
@@ -257,7 +256,6 @@
            (cell.pointLocation.latitude != 0.0f && cell.pointLocation.longitude != 0.0f)
            )
         {
-            NSLog(@"cell.pointLocation.latitude = %f", cell.pointLocation.latitude);
             MKPointAnnotation *annotationPoint = [[MKPointAnnotation alloc] init];
             annotationPoint.coordinate = cell.pointLocation;
             annotationPoint.title = cell.titleLabel.text;
