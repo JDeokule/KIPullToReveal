@@ -17,6 +17,7 @@
     UITextField *_searchTextField;
     BOOL _scrollViewIsDraggedDownwards;
     double _lastDragOffset;
+    int middleViewHeight;
     
     @public
     MKMapView *_mapView;
@@ -31,13 +32,14 @@
 @synthesize centerUserLocation = _centerUserLocation;
 @synthesize mapView = _mapView;
 @synthesize toolbar = _toolbar;
+@synthesize middleView = _middleView;
 @synthesize mode = _mode;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
     self = [super initWithStyle:style];
     if (self) {
-        
+        middleViewHeight = 30;
     }
     return self;
 }
@@ -52,7 +54,14 @@
     [super viewWillAppear:animated];
 
     [self initializeMapView];
-    [self initalizeToolbar];
+    
+    if (self.mode == KIPullToRevealModeSmallView ) {
+        middleViewHeight = 30;
+        [self initializeView];
+    } else {
+        middleViewHeight = 44;
+        [self initalizeToolbar];
+    }
 }
 
 - (void) viewDidAppear:(BOOL)animated
@@ -68,40 +77,70 @@
 }
 
 #pragma mark - Private methods
+- (void) initializeView
+{
+    if (!self.middleView) {
+        self.middleView = [[UIView alloc] initWithFrame:CGRectMake(10, -middleViewHeight, 300, middleViewHeight)];
+        self.middleView.backgroundColor = [UIColor redColor];
+        self.middleView.alpha = .75;
+        [self.middleView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+
+        
+        UILabel *label = [UILabel new];
+        label.text = @"Whats going on around you";
+        [label sizeToFit];
+        [label setAutoresizingMask:UIViewAutoresizingFlexibleBottomMargin];
+        label.alpha = 1;
+        CGPoint o = label.frame.origin;
+        label.frame = CGRectMake(o.x, o.y, 300, label.frame.size.height);
+        label.textAlignment = NSTextAlignmentCenter;
+        label.backgroundColor = [UIColor clearColor];
+
+        [self.middleView addSubview:label];
+        
+
+        [self.tableView insertSubview:self.middleView aboveSubview:self.tableView];
+    }
+}
+
 - (void) initializeMapView
 {
-    [self.tableView setContentInset:UIEdgeInsetsMake(kKIPTRTableViewContentInsetX,0,0,0)];
-    _mapView = [[MKMapView alloc] initWithFrame:CGRectMake(0, self.tableView.contentInset.top*-1, self.tableView.bounds.size.width, self.tableView.contentInset.top)];
-    [_mapView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-    [_mapView setShowsUserLocation:YES];
-    [_mapView setUserInteractionEnabled:NO];
-    
-    if(_centerUserLocation)
-    {
-        [self centerToUserLocation];
-        [self zoomToUserLocation];
-    }
+    if (!_mapView) {
+        [self.tableView setContentInset:UIEdgeInsetsMake(kKIPTRTableViewContentInsetX,0,0,0)];
+        _mapView = [[MKMapView alloc] initWithFrame:CGRectMake(0, self.tableView.contentInset.top*-1, self.tableView.bounds.size.width, self.tableView.contentInset.top)];
+        [_mapView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        [_mapView setShowsUserLocation:YES];
+        [_mapView setUserInteractionEnabled:NO];
         
-    [self.tableView insertSubview:_mapView aboveSubview:self.tableView];
+        if(_centerUserLocation)
+        {
+            [self centerToUserLocation];
+            [self zoomToUserLocation];
+        }
+        
+        [self.tableView insertSubview:_mapView aboveSubview:self.tableView];
+    }
 }
 
 - (void) initalizeToolbar
 {
-    _toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, -44, self.tableView.bounds.size.width, 44)];
-    [_toolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-    
-    if (self.mode == KIPullToRevealModeSearch) {
-        _searchTextField = [[UITextField alloc] initWithFrame:CGRectMake(10, 7, _toolbar.bounds.size.width-20, 30)];
-        [_searchTextField setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-        [_searchTextField setBorderStyle:UITextBorderStyleRoundedRect];
-        [_searchTextField setReturnKeyType:UIReturnKeySearch];
-        [_searchTextField setClearButtonMode:UITextFieldViewModeWhileEditing];
-        [_searchTextField addTarget:self action:@selector(searchTextFieldBecomeFirstResponder:) forControlEvents:UIControlEventEditingDidBegin];
-        [_searchTextField setDelegate:self];
-        [_toolbar addSubview:_searchTextField];
-    }
+    if (!_toolbar) {
+        _toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, -middleViewHeight, self.tableView.bounds.size.width, middleViewHeight)];
+        [_toolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        
+        if (self.mode == KIPullToRevealModeSearch) {
+            _searchTextField = [[UITextField alloc] initWithFrame:CGRectMake(10, 7, _toolbar.bounds.size.width-20, 30)];
+            [_searchTextField setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+            [_searchTextField setBorderStyle:UITextBorderStyleRoundedRect];
+            [_searchTextField setReturnKeyType:UIReturnKeySearch];
+            [_searchTextField setClearButtonMode:UITextFieldViewModeWhileEditing];
+            [_searchTextField addTarget:self action:@selector(searchTextFieldBecomeFirstResponder:) forControlEvents:UIControlEventEditingDidBegin];
+            [_searchTextField setDelegate:self];
+            [_toolbar addSubview:_searchTextField];
+        }
 
-    [self.tableView insertSubview:_toolbar aboveSubview:self.tableView];
+        [self.tableView insertSubview:_toolbar aboveSubview:self.tableView];
+    }
 }
 
 - (void) centerToUserLocation
@@ -184,16 +223,16 @@
         [self.tableView scrollsToTop];
     }
 
-    if(contentOffset >= -44)
+    if(contentOffset >= -middleViewHeight)
     {
         [_toolbar removeFromSuperview];
-        [_toolbar setFrame:CGRectMake(0, contentOffset, self.tableView.bounds.size.width, 44)];
+        [_toolbar setFrame:CGRectMake(0, contentOffset, self.tableView.bounds.size.width, middleViewHeight)];
         [self.tableView addSubview:_toolbar];
     }
     else if(contentOffset < 0)
     {
         [_toolbar removeFromSuperview];
-        [_toolbar setFrame:CGRectMake(0, -44, self.tableView.bounds.size.width, 44)];
+        [_toolbar setFrame:CGRectMake(0, -middleViewHeight, self.tableView.bounds.size.width, middleViewHeight)];
         [self.tableView insertSubview:_toolbar aboveSubview:self.tableView];
         
         // Resize map to viewable size
@@ -227,7 +266,7 @@
     [UIView animateWithDuration:kKIPTRAnimationDuration
                      animations:^()
      {
-         [self.tableView setContentInset:UIEdgeInsetsMake(kKIPTRTableViewContentInsetX+44,0,0,0)];
+         [self.tableView setContentInset:UIEdgeInsetsMake(kKIPTRTableViewContentInsetX+middleViewHeight,0,0,0)];
          [_mapView setFrame:
           CGRectMake(0, self.tableView.contentInset.top*-1, self.tableView.bounds.size.width, self.tableView.contentInset.top)
           ];
@@ -247,11 +286,16 @@
 - (void) displayMapViewAnnotationsForTableViewCells
 {
     // ATM this is only working for one section !!!
+    
+    // do it this way!
+//    NSArray *enabledSections = [NSArray arrayWithObject:[NSNumber numberWithInt:1]];
+
+    int activeSection = 1;
 
     [_mapView removeAnnotations:_mapView.annotations];
-    for (int i = 0; i < [self.tableView numberOfRowsInSection:0]; i++)
+    for (int i = 0; i < [self.tableView numberOfRowsInSection:activeSection]; i++)
     {
-        KIPullToRevealCell *cell = (KIPullToRevealCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0]];
+        KIPullToRevealCell *cell = (KIPullToRevealCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:1]];
         if(CLLocationCoordinate2DIsValid(cell.pointLocation) &&
            (cell.pointLocation.latitude != 0.0f && cell.pointLocation.longitude != 0.0f)
            )

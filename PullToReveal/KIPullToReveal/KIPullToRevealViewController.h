@@ -14,6 +14,7 @@
 typedef enum {
 	/** Middle bar is shown using a UITextField. This is the default. */
 	KIPullToRevealModeSearch,
+    KIPullToRevealModeSmallView,
 	KIPullToRevealModeNone
 } KIPullToRevealMode;
 
@@ -34,6 +35,7 @@ typedef enum {
 @property (nonatomic, retain) MKMapView *mapView;
 
 @property (nonatomic, retain) UIToolbar *toolbar;
+@property (nonatomic, retain) UIView *middleView;
 
 @end
 
