@@ -290,12 +290,10 @@
     // do it this way!
 //    NSArray *enabledSections = [NSArray arrayWithObject:[NSNumber numberWithInt:1]];
 
-    int activeSection = 1;
-
     [_mapView removeAnnotations:_mapView.annotations];
-    for (int i = 0; i < [self.tableView numberOfRowsInSection:activeSection]; i++)
+    for (int section = 1; section < [self.tableView numberOfSections]; section++)
     {
-        KIPullToRevealCell *cell = (KIPullToRevealCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:1]];
+        KIPullToRevealCell *cell = (KIPullToRevealCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]];
         if(CLLocationCoordinate2DIsValid(cell.pointLocation) &&
            (cell.pointLocation.latitude != 0.0f && cell.pointLocation.longitude != 0.0f)
            )
