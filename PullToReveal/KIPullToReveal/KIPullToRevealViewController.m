@@ -82,7 +82,7 @@
     if (!self.middleView) {
         self.middleView = [[UIView alloc] initWithFrame:CGRectMake(10, -middleViewHeight, 300, middleViewHeight)];
         self.middleView.backgroundColor = [UIColor redColor];
-        self.middleView.alpha = .75;
+        self.middleView.alpha = .9;
         [self.middleView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
 
         
