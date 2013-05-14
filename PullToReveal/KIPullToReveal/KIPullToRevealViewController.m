@@ -18,11 +18,6 @@
     BOOL _scrollViewIsDraggedDownwards;
     double _lastDragOffset;
     int middleViewHeight;
-    
-    @public
-    MKMapView *_mapView;
-    __weak id <KIPullToRevealDelegate> _pullToRevealDelegate;
-    BOOL _centerUserLocation;
 }
 @end
 
@@ -33,6 +28,7 @@
 @synthesize mapView = _mapView;
 @synthesize toolbar = _toolbar;
 @synthesize middleView = _middleView;
+@synthesize middleViewLabel = _middleViewLabel;
 @synthesize mode = _mode;
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -55,7 +51,7 @@
 
     [self initializeMapView];
     
-    if (self.mode == KIPullToRevealModeSmallView ) {
+    if (self.mode == KIPullToRevealModeMiddleView ) {
         middleViewHeight = 30;
         [self initializeView];
     } else {
@@ -73,7 +69,6 @@
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 #pragma mark - Private methods
@@ -85,20 +80,18 @@
         self.middleView.alpha = .9;
         [self.middleView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
 
-        
-        UILabel *label = [UILabel new];
-        label.text = @"Whats going on around you";
-        [label sizeToFit];
-        [label setAutoresizingMask:UIViewAutoresizingFlexibleBottomMargin];
-        label.alpha = 1;
-        CGPoint o = label.frame.origin;
-        label.frame = CGRectMake(o.x, o.y, 300, label.frame.size.height);
-        label.textAlignment = NSTextAlignmentCenter;
-        label.backgroundColor = [UIColor clearColor];
+        _middleViewLabel = [UILabel new];
+        _middleViewLabel.text = @"Whats going on around you";
+        [_middleViewLabel sizeToFit];
+        [_middleViewLabel setAutoresizingMask:UIViewAutoresizingFlexibleBottomMargin];
+        _middleViewLabel.alpha = 1;
+        CGPoint o = _middleViewLabel.frame.origin;
+        _middleViewLabel.frame = CGRectMake(o.x, o.y + 4, 300, _middleViewLabel.frame.size.height);
+        _middleViewLabel.textAlignment = NSTextAlignmentCenter;
+        _middleViewLabel.backgroundColor = [UIColor clearColor];
 
-        [self.middleView addSubview:label];
+        [self.middleView addSubview:_middleViewLabel];
         
-
         [self.tableView insertSubview:self.middleView aboveSubview:self.tableView];
     }
 }
@@ -117,6 +110,8 @@
             [self centerToUserLocation];
             [self zoomToUserLocation];
         }
+        
+        _mapView.delegate = self;
         
         [self.tableView insertSubview:_mapView aboveSubview:self.tableView];
     }
@@ -285,26 +280,42 @@
 #pragma mark - MapView
 - (void) displayMapViewAnnotationsForTableViewCells
 {
-    // ATM this is only working for one section !!!
-    
-    // do it this way!
-//    NSArray *enabledSections = [NSArray arrayWithObject:[NSNumber numberWithInt:1]];
-
     [_mapView removeAnnotations:_mapView.annotations];
-    for (int section = 1; section < [self.tableView numberOfSections]; section++)
-    {
-        KIPullToRevealCell *cell = (KIPullToRevealCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]];
-        if(CLLocationCoordinate2DIsValid(cell.pointLocation) &&
-           (cell.pointLocation.latitude != 0.0f && cell.pointLocation.longitude != 0.0f)
-           )
-        {
-            MKPointAnnotation *annotationPoint = [[MKPointAnnotation alloc] init];
-            annotationPoint.coordinate = cell.pointLocation;
-            annotationPoint.title = cell.titleLabel.text;
-            [_mapView addAnnotation:annotationPoint];
-        }
+
+    for (int i = 0; i < [self.pullToRevealDelegate numberOfAnnotations]; i++) {
+        id<MKAnnotation> annotation = [self.pullToRevealDelegate annotationForIndex:i];
+        [_mapView addAnnotation:annotation];
     }
 }
+
+- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation
+{
+    if ([annotation isKindOfClass:[MKUserLocation class]]) {
+        return nil;
+    }
+    
+    MKAnnotationView *pin = [mapView dequeueReusableAnnotationViewWithIdentifier:@"Board Pin"];
+    if (!pin) {
+        pin = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"Board Pin"];
+        
+        UIButton *disclosureButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+        
+        pin.rightCalloutAccessoryView = disclosureButton;
+        pin.canShowCallout = YES;
+    } else {
+        pin.annotation = annotation;
+    }
+    
+    return pin;
+}
+
+
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
+{
+    if ([_pullToRevealDelegate respondsToSelector:@selector(didSelectAnnotation:)])
+        [_pullToRevealDelegate didSelectAnnotation:view.annotation];
+}
+
 
 - (void) zoomMapToFitAnnotations
 {
@@ -322,9 +333,9 @@
     [_mapView setVisibleMapRect:zoomRect animated:NO];
 }
 
-- (void) mapViewDidFinishLoadingMap:(MKMapView *)mapView
-{
-    [self displayMapViewAnnotationsForTableViewCells];
-}
+//- (void) mapViewDidFinishLoadingMap:(MKMapView *)mapView
+//{
+//    [self displayMapViewAnnotationsForTableViewCells];
+//}
 
 @end
