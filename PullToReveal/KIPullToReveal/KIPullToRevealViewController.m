@@ -81,7 +81,7 @@
         [_middleView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
 
         _middleViewLabel = [UILabel new];
-        _middleViewLabel.text = @"Whats going on around you";
+        _middleViewLabel.text = @"Happening in New York City";
         [_middleViewLabel sizeToFit];
         [_middleViewLabel setAutoresizingMask:UIViewAutoresizingFlexibleBottomMargin];
         _middleViewLabel.alpha = 1;
@@ -285,7 +285,8 @@
 
     for (int i = 0; i < [self.pullToRevealDelegate numberOfAnnotations]; i++) {
         id<MKAnnotation> annotation = [self.pullToRevealDelegate annotationForIndex:i];
-        [_mapView addAnnotation:annotation];
+        if (annotation)
+            [_mapView addAnnotation:annotation];
     }
 }
 
