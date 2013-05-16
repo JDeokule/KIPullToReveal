@@ -76,9 +76,9 @@
 {
     if (!self.middleView) {
         self.middleView = [[UIView alloc] initWithFrame:CGRectMake(10, -middleViewHeight, 300, middleViewHeight)];
-        self.middleView.backgroundColor = [UIColor redColor];
-        self.middleView.alpha = .9;
-        [self.middleView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        _middleView.backgroundColor = [UIColor redColor];
+        _middleView.alpha = .9;
+        [_middleView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
 
         _middleViewLabel = [UILabel new];
         _middleViewLabel.text = @"Whats going on around you";
@@ -86,7 +86,8 @@
         [_middleViewLabel setAutoresizingMask:UIViewAutoresizingFlexibleBottomMargin];
         _middleViewLabel.alpha = 1;
         CGPoint o = _middleViewLabel.frame.origin;
-        _middleViewLabel.frame = CGRectMake(o.x, o.y + 4, 300, _middleViewLabel.frame.size.height);
+        int padding = 2;
+        _middleViewLabel.frame = CGRectMake(o.x + padding, o.y + 4, 300 - (2*padding), _middleViewLabel.frame.size.height);
         _middleViewLabel.textAlignment = NSTextAlignmentCenter;
         _middleViewLabel.backgroundColor = [UIColor clearColor];
 
