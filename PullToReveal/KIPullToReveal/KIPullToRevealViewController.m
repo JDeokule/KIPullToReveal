@@ -103,7 +103,7 @@
         [self.tableView setContentInset:UIEdgeInsetsMake(kKIPTRTableViewContentInsetX,0,0,0)];
         _mapView = [[MKMapView alloc] initWithFrame:CGRectMake(0, self.tableView.contentInset.top*-1, self.tableView.bounds.size.width, self.tableView.contentInset.top)];
         [_mapView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-        [_mapView setShowsUserLocation:YES];
+        [_mapView setShowsUserLocation:NO];
         [_mapView setUserInteractionEnabled:NO];
         
         if(_centerUserLocation)
@@ -334,10 +334,5 @@
     }
     [_mapView setVisibleMapRect:zoomRect animated:NO];
 }
-
-//- (void) mapViewDidFinishLoadingMap:(MKMapView *)mapView
-//{
-//    [self displayMapViewAnnotationsForTableViewCells];
-//}
 
 @end
