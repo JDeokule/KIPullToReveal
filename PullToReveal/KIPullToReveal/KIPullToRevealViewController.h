@@ -43,6 +43,7 @@ typedef enum {
 
 @property (nonatomic, retain) UIView *middleView;
 @property (nonatomic, retain) UILabel *middleViewLabel;
+@property (nonatomic, retain) UIImageView *middleViewImageView;
 
 @end
 
