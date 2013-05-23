@@ -95,15 +95,14 @@
         _middleViewLabel.alpha = 1;
         CGPoint o = _middleViewLabel.frame.origin;
         int padding = 2;
-        CGSize s = _middleViewLabel.frame.size;
-        _middleViewLabel.frame = CGRectMake(o.x + padding + 25, o.y + 4, s.width, s.height);
+        _middleViewLabel.frame = CGRectMake(o.x + padding + 25, o.y + 5, 250, _middleViewLabel.frame.size.height);
         _middleViewLabel.backgroundColor = [UIColor clearColor];
 
         [_middleView addSubview:_middleViewLabel];
 
         // The image
         _middleViewImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"glyphicons_241_flash-small.png"]];
-        s = _middleViewImageView.frame.size;
+        CGSize s = _middleViewImageView.frame.size;
         _middleViewImageView.frame = CGRectMake(9, 5, s.width, s.height);
         _middleViewImageView.alpha = .6;
     
