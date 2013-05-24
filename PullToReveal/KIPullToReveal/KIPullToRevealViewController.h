@@ -45,6 +45,8 @@ typedef enum {
 @property (nonatomic, retain) UILabel *middleViewLabel;
 @property (nonatomic, retain) UIImageView *middleViewImageView;
 
+- (void) zoomMapToFitAnnotations;
+
 @end
 
 

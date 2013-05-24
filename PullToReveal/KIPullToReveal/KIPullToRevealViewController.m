@@ -11,6 +11,7 @@
 
 #import "KIPullToRevealViewController.h"
 #import <QuartzCore/QuartzCore.h>
+#import "MKMapView+ZoomToNYC.h"
 
 @interface KIPullToRevealViewController () <UIScrollViewDelegate, UITextFieldDelegate, MKMapViewDelegate>
 {
@@ -336,18 +337,23 @@
 
 - (void) zoomMapToFitAnnotations
 {
-    MKMapRect zoomRect = MKMapRectNull;
-    for (id <MKAnnotation> annotation in _mapView.annotations)
-    {
-        MKMapPoint annotationPoint = MKMapPointForCoordinate(annotation.coordinate);
-        MKMapRect pointRect = MKMapRectMake(annotationPoint.x, annotationPoint.y, 0.1, 0.1);
-        if (MKMapRectIsNull(zoomRect)) {
-            zoomRect = pointRect;
-        } else {
-            zoomRect = MKMapRectUnion(zoomRect, pointRect);
+    if (_mapView.annotations.count == 0) {
+        [self.mapView zoomToSoho];
+    } else {
+    
+        MKMapRect zoomRect = MKMapRectNull;
+        for (id <MKAnnotation> annotation in _mapView.annotations)
+        {
+            MKMapPoint annotationPoint = MKMapPointForCoordinate(annotation.coordinate);
+            MKMapRect pointRect = MKMapRectMake(annotationPoint.x, annotationPoint.y, 0.1, 0.1);
+            if (MKMapRectIsNull(zoomRect)) {
+                zoomRect = pointRect;
+            } else {
+                zoomRect = MKMapRectUnion(zoomRect, pointRect);
+            }
         }
+        [_mapView setVisibleMapRect:zoomRect animated:NO];
     }
-    [_mapView setVisibleMapRect:zoomRect animated:NO];
 }
 
 @end
