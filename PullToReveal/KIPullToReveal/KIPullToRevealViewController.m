@@ -183,7 +183,6 @@
 #pragma mark - ScrollView Delegate
 - (void) scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
-    RKLogInfo(@"scrollViewDidEndDragging");
     double contentOffset = scrollView.contentOffset.y;
     _lastDragOffset = contentOffset;
 
