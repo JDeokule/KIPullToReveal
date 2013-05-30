@@ -363,6 +363,14 @@
                 zoomRect = MKMapRectUnion(zoomRect, pointRect);
             }
         }
+        
+        double heightInc = zoomRect.size.height * .4;
+        double widthInc = zoomRect.size.width * .25;
+        MKMapPoint p = zoomRect.origin;
+        MKMapSize s = zoomRect.size;
+        zoomRect = MKMapRectMake(p.x - (widthInc/2), p.y-(heightInc/2), s.width+widthInc, s.height+heightInc);
+        
+        
         [_mapView setVisibleMapRect:zoomRect animated:NO];
     }
 }
