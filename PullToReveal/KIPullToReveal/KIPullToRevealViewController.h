@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
-
 #import "KIPullToRevealCell.h"
 
 typedef enum {
@@ -45,7 +44,10 @@ typedef enum {
 @property (nonatomic, retain) UILabel *middleViewLabel;
 @property (nonatomic, retain) UIImageView *middleViewImageView;
 
+@property (nonatomic, readonly) BOOL pinSelectionEnabled;
+
 - (void) zoomMapToFitAnnotations;
+- (void) setPinSelection:(BOOL)enabled;
 
 @end
 

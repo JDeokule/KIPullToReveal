@@ -33,6 +33,7 @@
 @synthesize middleViewLabel = _middleViewLabel;
 @synthesize middleViewImageView = _middleViewImageView;
 @synthesize mode = _mode;
+@synthesize pinSelectionEnabled = _pinSelectionEnabled;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -46,14 +47,14 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    [self initializeMapView];
 }
 
 - (void) viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
 
-    [self initializeMapView];
-    
     if (self.mode == KIPullToRevealModeMiddleView ) {
         middleViewHeight = 30;
         [self initializeView];
@@ -113,6 +114,14 @@
     }
 }
 
+- (void) setPinSelection:(BOOL)enabled
+{
+    if (_pinSelectionEnabled != enabled) {
+        _pinSelectionEnabled = enabled;
+        [self performSelectorOnMainThread:@selector(displayMapViewAnnotationsForTableViewCells) withObject:nil waitUntilDone:YES];
+    }
+}
+
 - (void) initializeMapView
 {
     if (!_mapView) {
@@ -120,7 +129,8 @@
         _mapView = [[MKMapView alloc] initWithFrame:CGRectMake(0, self.tableView.contentInset.top*-1, self.tableView.bounds.size.width, self.tableView.contentInset.top)];
         [_mapView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
         [_mapView setShowsUserLocation:NO];
-        [_mapView setUserInteractionEnabled:NO];
+        [_mapView setUserInteractionEnabled:YES];
+        [self setPinSelection:NO];
         
         if(_centerUserLocation)
         {
@@ -169,16 +179,18 @@
     [_mapView setRegion:mapRegion animated: YES];
 }
 
+
 #pragma mark - ScrollView Delegate
 - (void) scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
+    RKLogInfo(@"scrollViewDidEndDragging");
     double contentOffset = scrollView.contentOffset.y;
     _lastDragOffset = contentOffset;
 
     if(contentOffset < kKIPTRTableViewContentInsetX*-1)
     {
         [self zoomMapToFitAnnotations];
-        [_mapView setUserInteractionEnabled:YES];
+        [self setPinSelection:YES];
         
         [UIView animateWithDuration:kKIPTRAnimationDuration
                          animations:^()
@@ -189,7 +201,7 @@
     }
     else if (contentOffset >= kKIPTRTableViewContentInsetX*-1)
     {
-        [_mapView setUserInteractionEnabled:NO];
+        [self setPinSelection:NO];
         
         [UIView animateWithDuration:kKIPTRAnimationDuration
                          animations:^()
@@ -211,7 +223,7 @@
 - (void) scrollViewDidScroll:(UIScrollView *)scrollView
 {
     double contentOffset = scrollView.contentOffset.y;
-    
+
     if (contentOffset < _lastDragOffset)
         _scrollViewIsDraggedDownwards = YES;
     else
@@ -222,8 +234,9 @@
         [_mapView setFrame:
          CGRectMake(0, self.tableView.contentInset.top*-1, self.tableView.bounds.size.width, self.tableView.contentInset.top)
          ];
-        [_mapView setUserInteractionEnabled:NO];
+        [self setPinSelection:NO];
 
+        RKLogInfo(@"Setting content inset: %.f", kKIPTRTableViewContentInsetX);
         [self.tableView setContentInset:UIEdgeInsetsMake(kKIPTRTableViewContentInsetX,0,0,0)];
         
         if(_centerUserLocation)
@@ -237,16 +250,16 @@
 
     if(contentOffset >= -middleViewHeight)
     {
-        [_toolbar removeFromSuperview];
-        [_toolbar setFrame:CGRectMake(0, contentOffset, self.tableView.bounds.size.width, middleViewHeight)];
-        [self.tableView addSubview:_toolbar];
+//        [_toolbar removeFromSuperview];
+//        [_toolbar setFrame:CGRectMake(0, contentOffset, self.tableView.bounds.size.width, middleViewHeight)];
+//        [self.tableView addSubview:_toolbar];
     }
     else if(contentOffset < 0)
     {
-        [_toolbar removeFromSuperview];
-        [_toolbar setFrame:CGRectMake(0, -middleViewHeight, self.tableView.bounds.size.width, middleViewHeight)];
-        [self.tableView insertSubview:_toolbar aboveSubview:self.tableView];
-        
+//        [_toolbar removeFromSuperview];
+//        [_toolbar setFrame:CGRectMake(0, -middleViewHeight, self.tableView.bounds.size.width, middleViewHeight)];
+//        [self.tableView insertSubview:_toolbar aboveSubview:self.tableView];
+
         // Resize map to viewable size
         [_mapView setFrame:
          CGRectMake(0, self.tableView.bounds.origin.y, self.tableView.bounds.size.width, contentOffset*-1)
@@ -282,7 +295,7 @@
          [_mapView setFrame:
           CGRectMake(0, self.tableView.contentInset.top*-1, self.tableView.bounds.size.width, self.tableView.contentInset.top)
           ];
-         [_mapView setUserInteractionEnabled:NO];
+         [self setPinSelection:NO];
          
          if(_centerUserLocation)
          {
@@ -315,7 +328,7 @@
     MKAnnotationView *pin = [mapView dequeueReusableAnnotationViewWithIdentifier:@"Board Pin"];
     if (!pin) {
         pin = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"Board Pin"];
-        
+
         UIButton *disclosureButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
         
         pin.rightCalloutAccessoryView = disclosureButton;
@@ -323,7 +336,7 @@
     } else {
         pin.annotation = annotation;
     }
-    
+
     return pin;
 }
 
