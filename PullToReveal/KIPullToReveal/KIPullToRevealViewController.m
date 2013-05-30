@@ -236,7 +236,6 @@
          ];
         [self setPinSelection:NO];
 
-        RKLogInfo(@"Setting content inset: %.f", kKIPTRTableViewContentInsetX);
         [self.tableView setContentInset:UIEdgeInsetsMake(kKIPTRTableViewContentInsetX,0,0,0)];
         
         if(_centerUserLocation)
