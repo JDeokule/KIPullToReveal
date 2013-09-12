@@ -29,9 +29,9 @@
 @synthesize centerUserLocation = _centerUserLocation;
 @synthesize mapView = _mapView;
 @synthesize toolbar = _toolbar;
-@synthesize middleView = _middleView;
-@synthesize middleViewLabel = _middleViewLabel;
-@synthesize middleViewImageView = _middleViewImageView;
+//@synthesize middleView = _middleView;
+//@synthesize middleViewLabel = _middleViewLabel;
+//@synthesize middleViewImageView = _middleViewImageView;
 @synthesize mode = _mode;
 @synthesize pinSelectionEnabled = _pinSelectionEnabled;
 
@@ -57,7 +57,7 @@
 
     if (self.mode == KIPullToRevealModeMiddleView ) {
         middleViewHeight = 30;
-        [self initializeView];
+//        [self initializeView];
     } else {
         middleViewHeight = 44;
         [self initalizeToolbar];
@@ -78,40 +78,6 @@
 #pragma mark - Private methods
 - (void) initializeView
 {
-    if (!self.middleView) {
-        self.middleView = [[UIView alloc] initWithFrame:CGRectMake(10, -middleViewHeight, 300, middleViewHeight)];
-
-        _middleView.layer.shadowColor = [UIColor blackColor].CGColor;
-        _middleView.layer.shadowOpacity = .5;
-        _middleView.layer.shadowOffset = CGSizeMake(0, -1);
-        _middleView.backgroundColor = [UIColor colorWithWhite:.95 alpha:1];
-        
-        // The Label
-        _middleViewLabel = [UILabel new];
-        _middleViewLabel.text = @"Happening in New York City";
-        _middleViewLabel.textColor = [UIColor colorWithWhite:.40 alpha:1];
-        _middleViewLabel.textAlignment = NSTextAlignmentLeft;
-        _middleViewLabel.font = [UIFont fontWithName:@"Avenir-Heavy" size:14];
-        [_middleViewLabel sizeToFit];
-        [_middleViewLabel setAutoresizingMask:UIViewAutoresizingFlexibleBottomMargin];
-        _middleViewLabel.alpha = 1;
-        CGPoint o = _middleViewLabel.frame.origin;
-        int padding = 2;
-        _middleViewLabel.frame = CGRectMake(o.x + padding + 25, o.y + 5, 250, _middleViewLabel.frame.size.height);
-        _middleViewLabel.backgroundColor = [UIColor clearColor];
-
-        [_middleView addSubview:_middleViewLabel];
-
-        // The image
-        _middleViewImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"glyphicons_241_flash-small.png"]];
-        CGSize s = _middleViewImageView.frame.size;
-        _middleViewImageView.frame = CGRectMake(9, 5, s.width, s.height);
-        _middleViewImageView.alpha = .6;
-    
-        [_middleView addSubview:_middleViewImageView];
-        
-        [self.tableView insertSubview:self.middleView aboveSubview:self.tableView];
-    }
 }
 
 - (void) setPinSelection:(BOOL)enabled
