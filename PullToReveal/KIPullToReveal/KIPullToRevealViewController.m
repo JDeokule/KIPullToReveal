@@ -80,6 +80,13 @@
 {
     [super viewDidAppear:animated];
     [self reloadPins];
+    [UIView animateWithDuration:kKIPTRAnimationDuration/2.0
+                     animations:^()
+     {
+         [self.tableView setContentInset:UIEdgeInsetsMake(self.tableViewContentInsetX,0,0,0)];
+         [self.tableView scrollsToTop];
+     }];
+
 }
 
 - (void)didReceiveMemoryWarning
