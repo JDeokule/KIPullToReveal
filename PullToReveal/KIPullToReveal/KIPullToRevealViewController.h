@@ -31,6 +31,7 @@
 
 @property (nonatomic, readonly) BOOL pinSelectionEnabled;
 
+- (void) reloadPins;
 - (void) zoomMapToFitAnnotations;
 - (void) setPinSelection:(BOOL)enabled;
 

@@ -79,7 +79,7 @@
 - (void) viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    [self displayMapViewAnnotationsFromDelegate];
+    [self reloadPins];
 }
 
 - (void)didReceiveMemoryWarning
@@ -92,7 +92,7 @@
 {
     if (_pinSelectionEnabled != enabled) {
         _pinSelectionEnabled = enabled;
-        [self performSelectorOnMainThread:@selector(displayMapViewAnnotationsFromDelegate) withObject:nil waitUntilDone:YES];
+        [self performSelectorOnMainThread:@selector(reloadPins) withObject:nil waitUntilDone:YES];
     }
 }
 
@@ -209,21 +209,29 @@
     {
         [self centerToUserLocation];
         [self zoomToUserLocation];
-        [self displayMapViewAnnotationsFromDelegate];
+        [self reloadPins];
     }
 }
 
 
 #pragma mark - MapView
-- (void) displayMapViewAnnotationsFromDelegate
+- (void) reloadPins
 {
-    [_mapView removeAnnotations:_mapView.annotations];
+    NSMutableArray *annotationsToRemove = [NSMutableArray arrayWithCapacity:self.mapView.annotations.count];
+    for (id<MKAnnotation> a in self.mapView.annotations)
+        if (![a isKindOfClass:[MKUserLocation class]])
+            [annotationsToRemove addObject:a];
+    [self.mapView removeAnnotations:annotationsToRemove];
 
     for (int i = 0; i < [self.pullToRevealDelegate numberOfAnnotations]; i++) {
         id<MKAnnotation> annotation = [self.pullToRevealDelegate annotationForIndex:i];
-        if (annotation)
+        CLLocationCoordinate2D c = annotation.coordinate;
+        if (annotation && c.latitude != 0 && c.longitude != 0) {
             [_mapView addAnnotation:annotation];
+        }
     }
+    
+    [self zoomMapToFitAnnotations];
 }
 
 - (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation
